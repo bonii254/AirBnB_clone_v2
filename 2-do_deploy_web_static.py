@@ -2,7 +2,7 @@
 """
 Module creates .tgz archive, distributes it to the web servers"""
 
-from fabric.api import local, run, put, env, cd
+from fabric.api import local, run, put, env, cd, execute
 import os
 from datetime import datetime
 
