@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+"""
+Module creates .tgz archive, distributes it to the web servers"""
 
 from fabric.api import local, run, put, env, cd
 import os
@@ -23,6 +25,7 @@ def do_pack():
 
 
 def do_deploy(archive_path):
+	"""distributes an archive to your web servers,"""
     if not os.path.exists(archive_path):
         return false
 
