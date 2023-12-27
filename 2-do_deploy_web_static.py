@@ -2,7 +2,7 @@
 """
 Module creates .tgz archive, distributes it to the web servers"""
 
-from fabric.api import local, run, put, env, cd, execute
+from fabric.api import local, run, put, env, cd
 import os
 from datetime import datetime
 
@@ -25,14 +25,14 @@ def do_pack():
 
 
 def do_deploy(archive_path):
-	"""distributes an archive to your web servers,"""
+    """distributes an archive to your web servers,"""
     if not os.path.exists(archive_path):
         return false
 
     archive_name = os.path.basename(archive_path)
-    archive_name_without_ext = os.path.splitext(path_name)
+    archive_name_without_ext = os.path.splitext((path_name))[0]
 
-    uploaded = put(archive_path, '/temp/')
+    uploaded = put(archive_path, '/tmp/')
     if uploaded.failed:
         return false
     path = run('mkdir -p /data/web_static/releases/{}'.format(
@@ -45,13 +45,13 @@ def do_deploy(archive_path):
     if uncompressed.failed:
         return false
 
-    run('rm -rf /temp/{}'.format(archive_name))
+    run('rm -rf /tmp/{}'.format(archive_name))
     move = run("mv {}/web_static/* {}".format(path, path))
     if move.failed:
         return false
 
     with cd("/data/webstatic"):
-        rm_lnk = run("rm -rf /data/webstatic/current")
+        rm_lnk = run("rm -rf /data/web_static/current")
         if rm_lnk.failed:
             return false
         update_link = run("ln -sf {} /data/web_static/current".format(path))
