@@ -6,6 +6,7 @@ from datetime import datetime
 
 env.hosts = ['18.234.106.42', '34.224.5.203']
 
+
 def do_pack():
     """Generates a .tgz archive form contents of web static."""
     try:
@@ -31,16 +32,15 @@ def do_deploy(archive_path):
     """
     if not os.path.exists(archive_path):
         return False
-	archive_name = os.path.basename(archive_path)
+    archive_name = os.path.basename(archive_path)
     archive_name_without_ext = os.path.splitext((archive_name))[0]
-	
     uploaded = put(archive_path, "/tmp/")
     if uploaded.failed:
         return false
 
     path = run('mkdir -p /data/web_static/releases/{}'.format(
         archive_name_without_ext))
-	if path.failed:
+    if path.failed:
         return false
 
     path = '/data/web_static/releases/{}'.format(archive_name_without_ext)
