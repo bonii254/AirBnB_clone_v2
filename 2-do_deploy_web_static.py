@@ -1,63 +1,49 @@
 #!/usr/bin/python3
-"""Module creates .tgz archive, distributes it to the web servers"""
-import os
-from fabric.api import local, cd, put, run, env
-from datetime import datetime
+# Fabfile to distribute an archive to a web server.
+import os.path
+from fabric.api import env
+from fabric.api import put
+from fabric.api import run
 
-env.hosts = ['18.234.106.42', '34.224.5.203']
-
-def do_pack():
-    """Generates a .tgz archive form contents of web static."""
-    try:
-        local("mkdir -p versions")
-        current_time = datetime.now()
-        archive_filename = "web_static_{}.tgz".format(
-            current_time.strftime("%Y%m%d%H%M%S"))
-        local("tar -czvf versions/{} web_static".format(archive_filename))
-        return "versions/{}".format(archive_filename)
-    except Exception as e:
-        print("Error:", str(e))
-        return None
+env.hosts = ["18.234.106.42", "34.224.5.203"]
 
 
 def do_deploy(archive_path):
-    """Deploys static files to our web servers.
+    """Distributes an archive to a web server.
 
-    Atributes:
-        archive_path(str): path to archive with our static files.
+    Args:
+        archive_path (str): The path of the archive to distribute.
     Returns:
-        True(boolean): on success,
-        False(boolean): on fail.
+        If the file doesn't exist at archive_path or an error occurs - False.
+        Otherwise - True.
     """
-    if not os.path.exists(archive_path):
+    if os.path.isfile(archive_path) is False:
         return False
-	archive_name = os.path.basename(archive_path)
-    archive_name_without_ext = os.path.splitext((archive_name))[0]
-	
-    uploaded = put(archive_path, "/tmp/")
-    if uploaded.failed:
-        return false
+    file = archive_path.split("/")[-1]
+    name = file.split(".")[0]
 
-    path = run('mkdir -p /data/web_static/releases/{}'.format(
-        archive_name_without_ext))
-	if path.failed:
-        return false
-
-    path = '/data/web_static/releases/{}'.format(archive_name_without_ext)
-    uncompressed = run("tar -xzvf /tmp/{} -C {}".format(archive_name, path))
-    if uncompressed.failed:
-        return false
-
-    run('rm -rf /tmp/{}'.format(archive_name))
-    move = run("mv {}/web_static/* {}".format(path, path))
-    if move.failed:
-        return false
-
-    with cd("/data/web_static"):
-        rm_lnk = run("rm -rf /data/web_static/current")
-        if rm_lnk.failed:
-            return False
-        update_lnk = run("ln -sf  {} /data/web_static/current".format(path))
-        if update_lnk.failed:
-            return False
-    return true
+    if put(archive_path, "/tmp/{}".format(file)).failed is True:
+        return False
+    if run("rm -rf /data/web_static/releases/{}/".
+           format(name)).failed is True:
+        return False
+    if run("mkdir -p /data/web_static/releases/{}/".
+           format(name)).failed is True:
+        return False
+    if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".
+           format(file, name)).failed is True:
+        return False
+    if run("rm /tmp/{}".format(file)).failed is True:
+        return False
+    if run("mv /data/web_static/releases/{}/web_static/* "
+           "/data/web_static/releases/{}/".format(name, name)).failed is True:
+        return False
+    if run("rm -rf /data/web_static/releases/{}/web_static".
+           format(name)).failed is True:
+        return False
+    if run("rm -rf /data/web_static/current").failed is True:
+        return False
+    if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".
+           format(name)).failed is True:
+        return False
+    return True
