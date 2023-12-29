@@ -21,5 +21,4 @@ class Amenity(BaseModel, Base):
      """This class defines a place by various attributes"""
      __tablename__ = "amenities"
      name = Column(String(128), nullable=False)
-     places = relationship("Place", secondary="place_amenity", 
-                                    back_populates="amenities", overlaps="place_amenity")
+     places = relationship("Place", secondary="place_amenity)
