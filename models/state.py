@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship
 from models.base_model import BaseModel
 from models.base_model import Base
 
+
 class State(BaseModel, Base):
     """ State class for a MySQL database"""
     __tablename__ = "states"
