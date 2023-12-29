@@ -60,3 +60,9 @@ class FileStorage:
         if obj is not None:
             del FileStorage\
                     .__objs[(obj.to_dict()["__class__"] + "." + obj.id)]
+
+ 
+    def close(self):
+        """ calls reload()
+        """
+        self.reload()
