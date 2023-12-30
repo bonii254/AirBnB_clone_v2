@@ -10,15 +10,15 @@ from models.base_model import BaseModel
 from models.base_model import Base
 from models.city import City
 
+
 class State(BaseModel, Base):
     """ State class for a MySQL database"""
     __tablename__ = "states"
 
     name = Column(String(128), nullable=False)
+    cities = relationship("City", backref="state", cascade="delete")
 
-    if getenv("HBNB_TYPE_STORAGE") == "db":
-        cities = relationship("City", backref="state", cascade="delete")
-    else:
+    if getenv("HBNB_TYPE_STORAGE") != "db":
         @property
         def cities(self):
             """Gets list of all cities objects related to state_id"""
