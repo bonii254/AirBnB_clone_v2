@@ -8,7 +8,7 @@ from sqlalchemy import String
 from sqlalchemy.orm import relationship
 from models.base_model import BaseModel
 from models.base_model import Base
-
+from models.city import City
 
 class State(BaseModel, Base):
     """ State class for a MySQL database"""
